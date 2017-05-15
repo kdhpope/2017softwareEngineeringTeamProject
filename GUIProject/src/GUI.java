@@ -46,13 +46,13 @@ public class GUI extends JFrame implements ActionListener {
       centerScreenSet();
       setDefaultCloseOperation(EXIT_ON_CLOSE);
    }
-   public void centerScreenSet() {
+   private void centerScreenSet() {
 	      frameSize = getSize();
 	      screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	      setLocation((screenSize.width - frameSize.width)/2, (screenSize.height - frameSize.height)/2);
    }
    
-   public void InitLayout() {
+   private void InitLayout() {
       setLayout(null);
       
       rightPane.setEditable(false);
@@ -124,22 +124,21 @@ public class GUI extends JFrame implements ActionListener {
             
          String dfName = dialog.getDirectory() + dialog.getFile();
          tmpdir = dfName;
-         String lineNumber;
          
          try {
-            BufferedReader reader = new BufferedReader(new FileReader(dfName));
-            leftPane.setText("");
-            while((lineNumber = reader.readLine()) != null){
-            	leftPane.setText(leftPane.getText()+lineNumber);
-            }
-            reader.close();
-            
+             BufferedReader reader = new BufferedReader(new FileReader(dfName));
+             leftPane.setText("");
+             do {
+                leftPane.read(reader, null);
+             } while(reader.readLine() != null);
+             reader.close();
+             
          } catch (Exception e2) {
             JOptionPane.showMessageDialog(this, "로딩 실패");
          }
       }
       else if(e.getSource().equals(leftedit)) {
-         leftEditText();
+         returnPanelText(leftPane);
       }
       else if(e.getSource().equals(leftsave)) {
          try {
@@ -189,8 +188,8 @@ public class GUI extends JFrame implements ActionListener {
          }
       }
    }
-      
  
+   
    public void rightEditText(){
       if(rightPane.isEditable() == false) {
          rightPane.setEditable(true);
@@ -203,6 +202,10 @@ public class GUI extends JFrame implements ActionListener {
       }
    
    }
+   public String getPanelText(JTextPane textPane){
+	   return textPane.getText();
+   }
+   
    public void leftEditText() {
       if(leftPane.isEditable() == false){
          leftPane.setEditable(true);
