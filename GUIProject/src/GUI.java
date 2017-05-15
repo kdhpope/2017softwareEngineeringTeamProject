@@ -1,18 +1,22 @@
-import javax.swing.*;
-import javax.swing.JOptionPane;
-import java.awt.event.ActionListener;
+
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.FileDialog;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.Toolkit;
- 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
  
 public class GUI extends JFrame implements ActionListener {
  
@@ -46,13 +50,13 @@ public class GUI extends JFrame implements ActionListener {
       centerScreenSet();
       setDefaultCloseOperation(EXIT_ON_CLOSE);
    }
-   private void centerScreenSet() {
+   public void centerScreenSet() {
 	      frameSize = getSize();
 	      screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	      setLocation((screenSize.width - frameSize.width)/2, (screenSize.height - frameSize.height)/2);
    }
    
-   private void InitLayout() {
+   public void InitLayout() {
       setLayout(null);
       
       rightPane.setEditable(false);
@@ -124,6 +128,7 @@ public class GUI extends JFrame implements ActionListener {
             
          String dfName = dialog.getDirectory() + dialog.getFile();
          tmpdir = dfName;
+         String lineNumber;
          
          try {
              BufferedReader reader = new BufferedReader(new FileReader(dfName));
@@ -138,7 +143,7 @@ public class GUI extends JFrame implements ActionListener {
          }
       }
       else if(e.getSource().equals(leftedit)) {
-         returnPanelText(leftPane);
+         leftEditText();
       }
       else if(e.getSource().equals(leftsave)) {
          try {
@@ -188,8 +193,8 @@ public class GUI extends JFrame implements ActionListener {
          }
       }
    }
+      
  
-   
    public void rightEditText(){
       if(rightPane.isEditable() == false) {
          rightPane.setEditable(true);
@@ -202,10 +207,6 @@ public class GUI extends JFrame implements ActionListener {
       }
    
    }
-   public String getPanelText(JTextPane textPane){
-	   return textPane.getText();
-   }
-   
    public void leftEditText() {
       if(leftPane.isEditable() == false){
          leftPane.setEditable(true);
