@@ -1,16 +1,19 @@
-
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -18,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
  
-public class GUI extends JFrame implements ActionListener {
+public class GUI extends JFrame {
  
    private Button leftedit = new Button("EDIT");
    private Button leftload = new Button("LOAD"); 
@@ -31,11 +34,13 @@ public class GUI extends JFrame implements ActionListener {
    private Button compare = new Button("COMPARE");
    private JPanel rightText = new JPanel();
    private JPanel leftText = new JPanel();
-   private JTextPane rightPane = new JTextPane();
-   private JTextPane leftPane = new JTextPane();
+   private static JTextPane rightPane = new JTextPane();
+   private static JTextPane leftPane = new JTextPane();
    private Dimension frameSize, screenSize;
    private JScrollPane rightScroll;
    private JScrollPane leftScroll;
+   private Frame ffd = new Frame();
+   private Frame fmd = new Frame();
    private String tmpdir;
    private String tmpdir2;
    
@@ -93,15 +98,206 @@ public class GUI extends JFrame implements ActionListener {
       rightedit.setBounds(850, 20, 150, 40);
       rightsave.setBounds(1000, 20, 150, 40);
       rightload.setBounds(700, 20, 150, 40);
+      ffd.setSize(300,200);
+      fmd.setSize(100,50);
       
-      leftload.addActionListener(this);
-      leftedit.addActionListener(this);
-      leftsave.addActionListener(this);
+      leftload.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  leftload.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  leftload.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  }
+      	     	  
+    	  @Override
+    	  public void mousePressed(MouseEvent e) {
+    		  FileDialog dialog = new FileDialog(ffd, "Browser for Load", FileDialog.LOAD);
+    	      dialog.setDirectory(".");
+    	      dialog.setVisible(true);
+    	      
+    	      if(dialog.getFile() == null) return;
+    	          
+    	      String dfName = dialog.getDirectory() + dialog.getFile();
+    	      tmpdir = dfName;
+    	      
+    	      try {
+    	             BufferedReader reader = new BufferedReader(new FileReader(tmpdir));
+    	             leftPane.setText("");
+    	             do {
+    	                leftPane.read(reader, null);
+    	             } while(reader.readLine() != null);
+    	             reader.close();
+    	             
+    	         } catch (Exception e2) {
+    	            JOptionPane.showMessageDialog(fmd, "로딩 실패");
+    	         }
+    	  }
+      });
       
-      rightload.addActionListener(this);
-      rightedit.addActionListener(this);
-      rightsave.addActionListener(this);
+      leftedit.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  leftedit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  leftedit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  } @Override
+    	  public void mousePressed(MouseEvent e) {
+    		  //마우스 나갈시
+    		  leftEditText();
+    	  }
+      });
       
+      leftsave.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  leftsave.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  leftsave.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  } @Override
+    	  public void mousePressed(MouseEvent e) {
+    		  try {
+    	            BufferedWriter writer = new BufferedWriter(new FileWriter(tmpdir));
+    	            leftPane.write(writer);
+    	            JOptionPane.showMessageDialog(fmd, "저장 성공");
+    	            writer.close();
+    	            
+    	         } catch (Exception e2) {
+    	            JOptionPane.showMessageDialog(fmd, "저장 실패");
+    	         }
+    	  }
+      });
+      
+      rightload.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  rightload.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  rightload.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  }
+    	  public void mousePressed(MouseEvent e) {
+    		  FileDialog dialog = new FileDialog(ffd, "Browser for Load", FileDialog.LOAD);
+    	      dialog.setDirectory(".");
+    	      dialog.setVisible(true);
+    	       
+    	      if(dialog.getFile() == null) return;
+    	          
+    	      String dfName2 = dialog.getDirectory() + dialog.getFile();
+    	      tmpdir2 = dfName2;
+    	      
+    	      try {
+    	           BufferedReader reader = new BufferedReader(new FileReader(tmpdir2));
+    	           rightPane.setText("");
+    	           do {
+    	              rightPane.read(reader, null);
+    	           } while(reader.readLine() != null);
+    	           reader.close();
+    	            
+    	         } catch (Exception e2) {
+    	            JOptionPane.showMessageDialog(fmd, "로딩 실패");
+    	         }
+    	  }    	  
+      });
+      
+      rightedit.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  rightedit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  rightedit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  } @Override
+    	  public void mousePressed(MouseEvent e) {
+    		  rightEditText();
+    	  }
+      });
+      
+      rightsave.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  rightsave.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  rightsave.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  } @Override
+    	  public void mousePressed(MouseEvent e) {
+    		  try {
+    			  BufferedWriter writer = new BufferedWriter(new FileWriter(tmpdir2));
+    	          rightPane.write(writer);
+    	          JOptionPane.showMessageDialog(fmd, "저장 성공");
+    	          writer.close();
+    	            
+    	         } catch (Exception e2) {
+    	            JOptionPane.showMessageDialog(fmd, "저장 실패");
+    	         }
+    	  }
+      });
+      
+      compare.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  compare.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  compare.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  }
+    	  public void mousePressed(MouseEvent e) {
+    	  }
+      });
+      copyToRight.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  leftedit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  leftedit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  } @Override
+    	  public void mousePressed(MouseEvent e) {
+    		  Merge.mergeToRight(leftPane,rightPane);
+    	  }
+      });
+      copyToleft.addMouseListener(new MouseAdapter() {
+    	  @Override
+    	  public void mouseEntered(MouseEvent e) {
+    		  //마우스 진입시
+    		  leftedit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    	  }
+    	  @Override
+    	  public void mouseExited(MouseEvent e) {
+    		  //마우스 나갈시
+    		  leftedit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	  } @Override
+    	  public void mousePressed(MouseEvent e) {
+    		  Merge.mergeToLeft(leftPane,rightPane);
+    	  }
+      });
       add(leftload);
       add(leftedit);
       add(leftsave);
@@ -117,89 +313,14 @@ public class GUI extends JFrame implements ActionListener {
       add(compare);
    }
    
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      if(e.getSource().equals(leftload)) {
-         FileDialog dialog = new FileDialog(this, "Load For Left", FileDialog.LOAD);
-         dialog.setDirectory(".");
-         dialog.setVisible(true);
-         
-         if(dialog.getFile() == null) return;
-            
-         String dfName = dialog.getDirectory() + dialog.getFile();
-         tmpdir = dfName;
-         String lineNumber;
-         
-         try {
-             BufferedReader reader = new BufferedReader(new FileReader(dfName));
-             leftPane.setText("");
-             do {
-                leftPane.read(reader, null);
-             } while(reader.readLine() != null);
-             reader.close();
-             
-         } catch (Exception e2) {
-            JOptionPane.showMessageDialog(this, "로딩 실패");
-         }
-      }
-      else if(e.getSource().equals(leftedit)) {
-         leftEditText();
-      }
-      else if(e.getSource().equals(leftsave)) {
-         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tmpdir));
-            leftPane.write(writer);
-            JOptionPane.showMessageDialog(this, "저장 성공");
-            writer.close();
-            
-         } catch (Exception e2) {
-            JOptionPane.showMessageDialog(this, "저장 실패");
-         }
-      }
-      else if(e.getSource().equals(rightload)) {
-         FileDialog dialog = new FileDialog(this, "Load For Right", FileDialog.LOAD);
-         dialog.setDirectory(".");
-         dialog.setVisible(true);
-         
-         if(dialog.getFile() == null) return;
-            
-         String dfName2 = dialog.getDirectory() + dialog.getFile();
-         tmpdir2 = dfName2;
-         
-         try {
-            BufferedReader reader = new BufferedReader(new FileReader(dfName2));
-            rightPane.setText("");
-            do {
-               rightPane.read(reader, null);
-            } while(reader.readLine() != null);
-            reader.close();
-            
-         } catch (Exception e2) {
-            JOptionPane.showMessageDialog(this, "로딩 실패");
-         }
-      }
-      else if(e.getSource().equals(rightedit)) {
-         rightEditText();
-      }
-      else if(e.getSource().equals(rightsave)) {
-         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tmpdir2));
-            rightPane.write(writer);
-            JOptionPane.showMessageDialog(this, "저장 성공");
-            writer.close();
-            
-         } catch (Exception e2) {
-            JOptionPane.showMessageDialog(this, "저장 실패");
-         }
-      }
-   }
-      
+	public static String getLeftPanelText() {
+		return leftPane.getText();
+	}
+	public static String getRightPanelText() {
+		return rightPane.getText();
+	}
    
-   public String getPanelText(JTextPane textPane){		
-	   	   return textPane.getText();		
-	      }
    
- 
    public void rightEditText(){
       if(rightPane.isEditable() == false) {
          rightPane.setEditable(true);
